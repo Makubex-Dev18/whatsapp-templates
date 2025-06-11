@@ -1,231 +1,344 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Plantillas WhatsApp</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plantillas WhatsApp</title>
+
+  <style>
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    .shimmer-effect::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s;
+    }
+
+    .shimmer-effect:hover::before {
+      left: 100%;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
-    <div class="container mx-auto max-w-6xl px-4 py-8">
-        <!-- Header -->
-        <header class="text-center mb-10">
-            <div class="flex justify-center items-center gap-3 mb-4">
-                <div class="bg-green-500 p-3 rounded-full shadow-lg">
-                    <i class="fab fa-whatsapp text-white text-3xl"></i>
-                </div>
-                <h1 class="text-4xl font-bold text-gray-800">Gestor de Plantillas</h1>
-            </div>
-            <p class="text-gray-600 text-lg">Administra y organiza tus plantillas de mensajes de WhatsApp</p>
-        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Formulario para crear plantillas -->
-            <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-100">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="bg-blue-500 p-2 rounded-lg">
-                        <i class="fas fa-plus text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800">Nueva Plantilla</h2>
-                </div>
-
-                <form class="space-y-6">
-                    <!-- Campo Título -->
-                    <div>
-                        <label for="template-title" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-heading text-blue-500 mr-2"></i>
-                            Título de la Plantilla
-                        </label>
-                        <input 
-                            type="text" 
-                            id="template-title"
-                            placeholder="Ej: Bienvenida a nuevos clientes"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 bg-gray-50 hover:bg-white"
-                        >
-                    </div>
-
-                    <!-- Campo Hashtag -->
-                    <div>
-                        <label for="template-hashtag" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-hashtag text-green-500 mr-2"></i>
-                            Hashtag (Categoría)
-                        </label>
-                        <input 
-                            type="text" 
-                            id="template-hashtag"
-                            placeholder="Ej: #bienvenida #ventas #soporte"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300 bg-gray-50 hover:bg-white"
-                        >
-                    </div>
-
-                    <!-- Campo Mensaje -->
-                    <div>
-                        <label for="template-message" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-comment-dots text-purple-500 mr-2"></i>
-                            Mensaje de la Plantilla
-                        </label>
-                        <textarea 
-                            id="template-message"
-                            rows="6"
-                            placeholder="Escribe aquí el contenido de tu plantilla de WhatsApp..."
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300 bg-gray-50 hover:bg-white resize-none"
-                        ></textarea>
-                        <div class="flex justify-between mt-2">
-                            <span class="text-xs text-gray-500">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Usa variables como {nombre}, {empresa}, etc.
-                            </span>
-                            <span class="text-xs text-gray-400" id="char-count">0/1000 caracteres</span>
-                        </div>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                        <button 
-                            type="button"
-                            id="save-template-btn"
-                            class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition duration-300 flex items-center justify-center gap-2 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                        >
-                            <i class="fas fa-save"></i>
-                            <span>Guardar Plantilla</span>
-                        </button>
-                        <button 
-                            type="button"
-                            id="clear-form-btn"
-                            class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
-                        >
-                            <i class="fas fa-eraser"></i>
-                            <span>Limpiar</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Vista previa -->
-            <div class="bg-white rounded-xl shadow-xl p-8 border border-gray-100">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="bg-green-500 p-2 rounded-lg">
-                        <i class="fas fa-eye text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800">Vista Previa</h2>
-                </div>
-
-                <!-- Simulador de WhatsApp -->
-                <div class="bg-gray-100 rounded-lg p-4 max-w-sm mx-auto">
-                    <div class="bg-green-500 text-white p-3 rounded-t-lg flex items-center gap-3">
-                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                            <i class="fas fa-user text-green-500 text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="font-medium text-sm">Tu Empresa</div>
-                            <div class="text-xs opacity-90">en línea</div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-4 rounded-b-lg min-h-[200px]">
-                        <div id="preview-content" class="text-gray-400 text-sm italic">
-                            La vista previa aparecerá aquí mientras escribes...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Info adicional -->
-                <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 class="font-medium text-blue-800 mb-2">
-                        <i class="fas fa-lightbulb mr-2"></i>
-                        Consejos para plantillas efectivas:
-                    </h4>
-                    <ul class="text-sm text-blue-700 space-y-1">
-                        <li>• Mantén los mensajes concisos y directos</li>
-                        <li>• Usa variables para personalizar contenido</li>
-                        <li>• Incluye llamadas a la acción claras</li>
-                        <li>• Organiza con hashtags por categoría</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección de plantillas guardadas -->
-        <div class="mt-12 bg-white rounded-xl shadow-xl p-8 border border-gray-100">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <div class="flex items-center gap-3">
-                    <div class="bg-purple-500 p-2 rounded-lg">
-                        <i class="fas fa-folder-open text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-gray-800">Plantillas Guardadas</h2>
-                </div>
-                
-                <!-- Filtros y búsqueda -->
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative">
-                        <input 
-                            type="text" 
-                            placeholder="Buscar plantillas..."
-                            class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 w-full sm:w-64"
-                            id="search-templates"
-                        >
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    </div>
-                    <select 
-                        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                        id="filter-hashtag"
-                    >
-                        <option value="">Todos los hashtags</option>
-                        <option value="bienvenida">#bienvenida</option>
-                        <option value="ventas">#ventas</option>
-                        <option value="soporte">#soporte</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Lista de plantillas -->
-            <div id="templates-container" class="space-y-4">
-                <!-- Plantilla de ejemplo 1 -->
-                
-
-            </div>
-
-            <!-- Estado vacío -->
-            <div id="empty-templates-state" class="text-center py-16 hidden">
-                <i class="fas fa-folder-open text-6xl text-gray-300 mb-4"></i>
-                <p class="text-gray-500 text-xl mb-2">No hay plantillas guardadas</p>
-                <p class="text-gray-400">¡Crea tu primera plantilla para comenzar!</p>
-            </div>
-        </div>
-
-        <!-- Estadísticas -->
-        <div class="mt-8 bg-white rounded-xl shadow-xl p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <i class="fas fa-chart-bar text-indigo-500"></i>
-                Estadísticas de Plantillas
-            </h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="text-center p-4 bg-blue-50 rounded-lg">
-                    <i class="fas fa-file-alt text-2xl text-blue-600 mb-2"></i>
-                    <h4 class="text-sm font-medium text-gray-700">Total</h4>
-                    <p class="text-xl font-bold text-blue-600" id="total-templates">3</p>
-                </div>
-                <div class="text-center p-4 bg-green-50 rounded-lg">
-                    <i class="fas fa-tags text-2xl text-green-600 mb-2"></i>
-                    <h4 class="text-sm font-medium text-gray-700">Categorías</h4>
-                    <p class="text-xl font-bold text-green-600" id="total-categories">6</p>
-                </div>
-                <div class="text-center p-4 bg-purple-50 rounded-lg">
-                    <i class="fas fa-clock text-2xl text-purple-600 mb-2"></i>
-                    <h4 class="text-sm font-medium text-gray-700">Recientes</h4>
-                    <p class="text-xl font-bold text-purple-600" id="recent-templates">1</p>
-                </div>
-                <div class="text-center p-4 bg-orange-50 rounded-lg">
-                    <i class="fas fa-star text-2xl text-orange-600 mb-2"></i>
-                    <h4 class="text-sm font-medium text-gray-700">Más Usadas</h4>
-                    <p class="text-xl font-bold text-orange-600" id="most-used">2</p>
-                </div>
-            </div>
+<body class="bg-gradient-to-br from-whatsapp-light-green to-gray-50 min-h-screen text-gray-700 leading-relaxed">
+  <main class="max-w-7xl mx-auto p-5 grid lg:grid-cols-2 gap-8 items-start">
+    <!-- Título Principal -->
+    <div class="lg:col-span-2 text-center mb-8">
+      <h1 class="text-4xl lg:text-5xl font-bold text-whatsapp-dark-green mb-4 drop-shadow-sm relative">
+        <span class="mr-4 text-4xl">💬</span>
+        Gestor de Plantillas para WhatsApp
+        <div
+          class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-whatsapp-green to-whatsapp-blue rounded-full">
         </div>
     </div>
 
-    <script src="js/models/Template.js"></script>
-    <script src="js/store.js"></script>
-    <script src="js/app.js"></script>
+    </h1>
+
+    </div>
+
+    <!-- Formulario de Nueva Plantilla -->
+    <div
+      class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up">
+      <h2 class="text-2xl font-semibold text-whatsapp-dark-green mb-6 flex items-center gap-3">
+        <span class="text-xl">✨</span>
+        Nueva Plantilla
+      </h2>
+
+      <form id="template-form" class="space-y-6">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Nombre de la Plantilla:
+          </label>
+          <input type="text" id="template-name" required placeholder="Ej: Nombre de Persona"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 focus:outline-none focus:border-whatsapp-green focus:bg-white focus:shadow-lg focus:-translate-y-1 focus:ring-4 focus:ring-whatsapp-green focus:ring-opacity-10" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            Mensaje:
+          </label>
+          <textarea id="template-message" required placeholder="Escribe tu mensaje inicial aquí..." rows="5"
+            class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-base transition-all duration-300 resize-y focus:outline-none focus:border-whatsapp-green focus:bg-white focus:shadow-lg focus:-translate-y-1 focus:ring-4 focus:ring-whatsapp-green focus:ring-opacity-10"></textarea>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 pt-2">
+          <button type="submit" id="save-btn"
+            class="flex-1 px-8 py-4 bg-gradient-to-r from-whatsapp-green to-whatsapp-dark-green text-white font-semibold rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden shimmer-effect">
+            💾 Guardar
+          </button>
+          <button type="button" id="cancel-edit-btn" style="display: none;"
+            class="flex-1 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden shimmer-effect">
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Vista Previa -->
+    <div
+      class="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up sticky top-5">
+      <h2 class="text-2xl font-semibold text-whatsapp-dark-green mb-6 flex items-center gap-3">
+        <span class="text-xl">🟢</span>
+        Vista Previa
+
+
+      </h2>
+      <div class="bg-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+        <!-- Header de WhatsApp -->
+        <div class="bg-whatsapp-green text-white p-4 flex items-center gap-3">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+            <span class="text-gray-600 text-sm font-medium">👤</span>
+          </div>
+          <div>
+            <div class="font-semibold text-white">Tu Empresa</div>
+            <div class="text-xs text-green-100">en línea</div>
+          </div>
+        </div>
+        <!-- Área de mensaje -->
+        <div id="preview-output"
+          class="bg-whatsapp-gray p-6 min-h-[200px] text-gray-600 relative empty:before:content-['La_vista_previa_aparecerá_aquí_mientras_escribes...'] empty:before:text-gray-400 empty:before:italic empty:before:absolute empty:before:top-1/2 empty:before:left-1/2 empty:before:transform empty:before:-translate-x-1/2 empty:before:-translate-y-1/2 empty:before:text-center empty:before:w-full empty:before:px-4">
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Plantillas -->
+    <div
+      class="lg:col-span-2 bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up mt-8">
+      <h2 class="text-2xl font-semibold text-whatsapp-dark-green mb-6 flex items-center gap-3">
+        <span class="text-xl">✨</span>
+        Plantillas guardadas
+      </h2>
+
+      <!-- AÑADIDO: Botón para descargar -->
+      <div class="flex justify-end mb-4">
+        <button id="download-btn"
+          class="px-6 py-3 bg-gradient-to-r from-green-500 to-indigo-600 text-white font-semibold rounded-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden shimmer-effect">
+          ⬇️ Descargar Plantillas
+        </button>
+      </div>
+
+
+
+      <ul id="templates-ul" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6"></ul>
+    </div>
+  </main>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'whatsapp-green': '#25D366',
+            'whatsapp-dark-green': '#128C7E',
+            'whatsapp-light-green': '#DCF8C6',
+            'whatsapp-blue': '#34B7F1',
+            'whatsapp-gray': '#ECE5DD',
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out',
+            'fade-in-up-fast': 'fadeInUp 0.4s ease-out',
+            'shimmer': 'shimmer 0.6s ease-in-out',
+            'spin-slow': 'spin 1s linear infinite',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(20px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              }
+            },
+            shimmer: {
+              '0%': { transform: 'translateX(-100%)' },
+              '100%': { transform: 'translateX(100%)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script type="module">
+    // Simulación del JavaScript original para demostración
+    const templateForm = document.getElementById('template-form');
+    const templateName = document.getElementById('template-name');
+    const templateMessage = document.getElementById('template-message');
+    const previewOutput = document.getElementById('preview-output');
+    const templatesUl = document.getElementById('templates-ul');
+    const saveBtn = document.getElementById('save-btn');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+    let templates = JSON.parse(localStorage.getItem('whatsapp-templates') || '[]');
+    let editingIndex = -1;
+
+    // Vista previa en tiempo real
+    function updatePreview() {
+      const message = templateMessage.value.trim();
+      if (message) {
+        previewOutput.className = 'bg-white border-2 border-solid border-whatsapp-green rounded-2xl p-6 min-h-[150px] transition-all duration-300 shadow-inner';
+        previewOutput.textContent = message;
+      } else {
+        previewOutput.className = 'bg-whatsapp-gray border-2 border-dashed border-whatsapp-green rounded-2xl p-6 min-h-[150px] transition-all duration-300 relative empty:before:content-[\'La_vista_previa_aparecerá_aquí...\'] empty:before:text-gray-400 empty:before:italic empty:before:absolute empty:before:top-1/2 empty:before:left-1/2 empty:before:transform empty:before:-translate-x-1/2 empty:before:-translate-y-1/2 empty:before:text-center empty:before:w-full';
+        previewOutput.textContent = '';
+      }
+    }
+
+    templateMessage.addEventListener('input', updatePreview);
+    templateName.addEventListener('input', updatePreview);
+
+    // Renderizar plantillas
+    function renderTemplates() {
+      templatesUl.innerHTML = '';
+      templates.forEach((template, index) => {
+        const li = document.createElement('li');
+        li.className = 'bg-white rounded-2xl p-6 shadow-lg border-l-4 border-whatsapp-green hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative animate-fade-in-up-fast group';
+        li.innerHTML = `
+          <div class="absolute top-4 right-4 text-xl opacity-70 group-hover:scale-110 transition-transform duration-300">📝</div>
+          <div class="font-bold text-whatsapp-dark-green text-lg mb-3 group-hover:text-whatsapp-green transition-colors duration-300">${template.name}</div>
+          <div class="text-gray-700 text-sm leading-relaxed mb-4 bg-gray-50 p-4 rounded-xl border-l-2 border-whatsapp-blue">${template.message}</div>
+          <div class="flex gap-2 justify-end">
+            <button 
+              class="px-4 py-2 bg-gradient-to-r from-whatsapp-blue to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden shimmer-effect"
+              onclick="editTemplate(${index})"
+            >
+              ✏️ Editar
+            </button>
+            <button 
+              class="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden shimmer-effect"
+              onclick="copyTemplate(${index})"
+            >
+              📋 Copiar
+            </button>
+            <button 
+              class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden shimmer-effect"
+              onclick="deleteTemplate(${index})"
+            >
+              🗑️ Eliminar
+            </button>
+          </div>
+        `;
+        templatesUl.appendChild(li);
+      });
+    }
+
+    // Guardar plantilla
+    templateForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = templateName.value.trim();
+      const message = templateMessage.value.trim();
+
+      if (!name || !message) {
+        alert("Por favor, completa todos los campos antes de guardar.");
+        return;
+      }
+      // Efecto de carga
+      saveBtn.classList.add('opacity-70', 'pointer-events-none');
+      saveBtn.innerHTML = '<div class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin-slow mr-2"></div>Guardando...';
+
+      setTimeout(() => {
+        if (editingIndex >= 0) {
+          templates[editingIndex] = { name, message };
+          editingIndex = -1;
+          saveBtn.textContent = '💾 Guardar';
+          cancelEditBtn.style.display = 'none';
+        } else {
+          templates.push({ name, message });
+        }
+
+        localStorage.setItem('whatsapp-templates', JSON.stringify(templates));
+        templateForm.reset();
+        updatePreview();
+        renderTemplates();
+
+        // Restaurar botón
+        saveBtn.classList.remove('opacity-70', 'pointer-events-none');
+        saveBtn.textContent = '💾 Guardar';
+      }, 500);
+    });
+
+    // Funciones globales
+    window.editTemplate = (index) => {
+      const template = templates[index];
+      templateName.value = template.name;
+      templateMessage.value = template.message;
+      editingIndex = index;
+      saveBtn.textContent = '📝 Actualizar';
+      cancelEditBtn.style.display = 'block';
+      updatePreview();
+
+      // Scroll al formulario
+      document.querySelector('form').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.copyTemplate = (index) => {
+      const template = templates[index];
+      navigator.clipboard.writeText(template.message).then(() => {
+        // Efecto visual de copiado
+        const button = event.target;
+        const originalText = button.textContent;
+        button.textContent = '✅ Copiado';
+        button.classList.add('bg-green-500');
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.classList.remove('bg-green-500');
+        }, 1500);
+      });
+    };
+
+    window.deleteTemplate = (index) => {
+      if (confirm('¿Estás seguro de que quieres eliminar esta plantilla?')) {
+        // Efecto de salida
+        const item = templatesUl.children[index];
+        item.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          templates.splice(index, 1);
+          localStorage.setItem('whatsapp-templates', JSON.stringify(templates));
+          renderTemplates();
+        }, 300);
+      }
+    };
+
+    cancelEditBtn.addEventListener('click', () => {
+      templateForm.reset();
+      editingIndex = -1;
+      saveBtn.textContent = '💾 Guardar';
+      cancelEditBtn.style.display = 'none';
+      updatePreview();
+    });
+
+    // Inicializar
+    renderTemplates();
+    updatePreview();
+    // Descargar plantillas en un archivo JSON
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const dataStr = JSON.stringify(templates, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "plantillas-whatsapp.json";
+      a.click();
+
+      URL.revokeObjectURL(url); // Limpieza
+    });
+  </script>
 </body>
+
 </html>

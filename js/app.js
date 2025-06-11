@@ -1,69 +1,95 @@
-let plantillas = [];
+import { store } from "./store.js";
+import { saveTemplates } from "./persistence.js";
 
-const btnSave = document.querySelector("#save-template-btn");
+const form = document.getElementById("template-form");
+const nameInput = document.getElementById("template-name");
+const messageInput = document.getElementById("template-message");
+const templatesList = document.getElementById("templates-ul");
+const previewOutput = document.getElementById("preview-output");
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
 
-btnSave.addEventListener("click", function () {
-  const inputTitle = document.querySelector("#template-title").value.trim();
-  const inputHashtag = document.querySelector("#template-hashtag").value.trim();
-  const inputMessage = document.querySelector("#template-message").value.trim();
+function renderTemplates() {
+  templatesList.innerHTML = "";
 
-  const newTemplate = new Template(inputTitle, inputHashtag, inputMessage);
+  store.getState().templates.forEach((template) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${template.name}</strong>: ${template.message}
+      <button data-id="${template.id}" class="edit-btn">Editar</button>
+      <button data-id="${template.id}" class="delete-btn">Eliminar</button>
+    `;
+    templatesList.appendChild(li);
+  });
 
-  plantillas = [...plantillas, newTemplate];
-  renderizarUI();
-});
-
-function eliminarPlantilla(index) {
-  plantillas = plantillas.filter((element, i) => i !== index);
-
-  renderizarUI();
+  attachEventListeners();
 }
 
-function renderizarUI() {
-  const containerTemplate = document.querySelector("#templates-container");
+function attachEventListeners() {
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      store.dispatch({ type: "DELETE_TEMPLATE", payload: id });
+      saveTemplates(store.getState().templates);
+      renderTemplates();
+    });
+  });
 
-  containerTemplate.innerHTML = "";
-
-  plantillas.forEach((element, index) => {
-    containerTemplate.innerHTML += `
-         <div class="bg-gray-50 rounded-lg p-6 border border-gray-200 hover:border-purple-300 transition duration-300 hover:shadow-md">
-               <div class="flex flex-col lg:flex-row lg:items-start gap-4">
-                  <div class="flex-1">
-                        <div class="flex items-start justify-between mb-3">
-                           <div>
-                              <h3 class="text-lg font-semibold text-gray-800 mb-1">${element.titulo} - ${index}</h3>
-                              <div class="flex gap-2 mb-2">
-                                    <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${element.hashtag}</span>
-                              </div>
-                           </div>
-                           <div class="text-xs text-gray-500">
-                              <i class="fas fa-calendar mr-1"></i>
-                           </div>
-                        </div>
-                        
-                        <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-                           <p class="text-gray-700 text-sm leading-relaxed">
-                              ${element.mensaje}
-                           </p>
-                        </div>
-                  </div>
-                  
-                  <div class="flex flex-row lg:flex-col gap-2 lg:ml-4">
-                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 flex items-center gap-2 text-sm">
-                           <i class="fas fa-copy"></i>
-                           <span class="hidden sm:inline">Copiar</span>
-                        </button>
-                        <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 flex items-center gap-2 text-sm">
-                           <i class="fas fa-edit"></i>
-                           <span class="hidden sm:inline">Editar</span>
-                        </button>
-                        <button onclick="eliminarPlantilla(${index})" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300 flex items-center gap-2 text-sm">
-                           <i class="fas fa-trash"></i>
-                           <span class="hidden sm:inline">Eliminar</span>
-                        </button>
-                  </div>
-               </div>
-         </div>
-      `;
+  document.querySelectorAll(".edit-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = e.target.dataset.id;
+      const template = store.getState().templates.find((t) => t.id === id);
+      if (template) {
+        nameInput.value = template.name;
+        messageInput.value = template.message;
+        previewOutput.innerText = template.message;
+        store.dispatch({ type: "START_EDITING", payload: id });
+        cancelEditBtn.style.display = "inline-block";
+      }
+    });
   });
 }
+
+function clearForm() {
+  nameInput.value = "";
+  messageInput.value = "";
+  previewOutput.innerText = "";
+  store.dispatch({ type: "CANCEL_EDITING" });
+  cancelEditBtn.style.display = "none";
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = nameInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!name || !message) {
+    alert("Todos los campos son obligatorios.");
+    return;
+  }
+
+  const editingId = store.getState().editingId;
+  if (editingId) {
+    store.dispatch({
+      type: "UPDATE_TEMPLATE",
+      payload: { id: editingId, name, message },
+    });
+  } else {
+    store.dispatch({
+      type: "ADD_TEMPLATE",
+      payload: { name, message },
+    });
+  }
+
+  saveTemplates(store.getState().templates);
+  renderTemplates();
+  clearForm();
+});
+
+cancelEditBtn.addEventListener("click", clearForm);
+
+// Vista previa en tiempo real
+messageInput.addEventListener("input", () => {
+  previewOutput.innerText = messageInput.value;
+});
+
+renderTemplates();
